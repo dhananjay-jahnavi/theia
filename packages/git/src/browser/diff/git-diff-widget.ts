@@ -5,9 +5,7 @@
  * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
  */
 
-import { injectable, inject } from "inversify";
 import { h } from "@phosphor/virtualdom";
-import { GIT_DIFF } from "./git-diff-contribution";
 import { DiffUris } from '@theia/editor/lib/browser/diff-uris';
 import { VirtualRenderer, open, OpenerService, StatefulWidget } from "@theia/core/lib/browser";
 import { GitRepositoryProvider } from '../git-repository-provider';
@@ -18,19 +16,18 @@ import { LabelProvider } from '@theia/core/lib/browser/label-provider';
 import { GitBaseWidget } from "../git-base-widget";
 import { GitFileChangeNode } from "../git-widget";
 
-@injectable()
 export class GitDiffWidget extends GitBaseWidget implements StatefulWidget {
 
     protected fileChangeNodes: GitFileChangeNode[];
     protected options: Git.Options.Diff;
 
     constructor(
-        @inject(Git) protected readonly git: Git,
-        @inject(GitRepositoryProvider) protected repositoryProvider: GitRepositoryProvider,
-        @inject(LabelProvider) protected labelProvider: LabelProvider,
-        @inject(OpenerService) protected openerService: OpenerService) {
+        protected readonly git: Git,
+        protected repositoryProvider: GitRepositoryProvider,
+        protected labelProvider: LabelProvider,
+        protected openerService: OpenerService) {
         super(repositoryProvider, labelProvider);
-        this.id = GIT_DIFF;
+        this.id = "git-diff";
         this.title.label = "Diff";
 
         this.addClass('theia-git');

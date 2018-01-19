@@ -13,6 +13,7 @@ import { WidgetFactory } from "@theia/core/lib/browser";
 import { GitHistoryWidget } from "./git-history-widget";
 
 import '../../../src/browser/style/history.css';
+import { GitCommitDetailWidgetFactory } from "./git-commit-detail-widget-factory";
 
 export function bindGitHistoryModule(bind: interfaces.Bind) {
 
@@ -21,6 +22,8 @@ export function bindGitHistoryModule(bind: interfaces.Bind) {
         id: GIT_HISTORY,
         createWidget: () => ctx.container.get<GitHistoryWidget>(GitHistoryWidget)
     }));
+
+    bind(WidgetFactory).to(GitCommitDetailWidgetFactory).inSingletonScope();
 
     bind(GitHistoryContribution).toSelf().inSingletonScope();
     for (const identifier of [CommandContribution, MenuContribution, KeybindingContribution]) {

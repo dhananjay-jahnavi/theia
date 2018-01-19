@@ -18,6 +18,7 @@ import { FileSystem } from "@theia/filesystem/lib/common";
 import { DiffUris } from '@theia/editor/lib/browser/diff-uris';
 import { GIT_RESOURCE_SCHEME } from '../git-resource';
 import { Git } from "../../common";
+import { GitDiffWidgetFactory } from "./git-diff-widget-factory";
 
 export namespace GitDiffCommands {
     export const OPEN_FILE_DIFF: Command = {
@@ -25,8 +26,6 @@ export namespace GitDiffCommands {
         label: 'Compare with ...'
     };
 }
-
-export const GIT_DIFF = "git-diff";
 
 @injectable()
 export class GitDiffContribution extends AbstractViewContribution<GitDiffWidget> {
@@ -41,7 +40,7 @@ export class GitDiffContribution extends AbstractViewContribution<GitDiffWidget>
         @inject(MessageService) protected readonly notifications: MessageService
     ) {
         super({
-            widgetId: GIT_DIFF,
+            widgetId: GitDiffWidgetFactory.ID,
             widgetName: 'Git diff',
             defaultWidgetOptions: {
                 area: 'left',
@@ -90,7 +89,6 @@ export class GitDiffContribution extends AbstractViewContribution<GitDiffWidget>
         const widget = await this.widget;
         await widget.setContent(options);
         this.openView({
-            toggle: true,
             activate: true
         });
     }

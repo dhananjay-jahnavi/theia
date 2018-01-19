@@ -8,7 +8,7 @@
 import { injectable, inject } from "inversify";
 import { h } from "@phosphor/virtualdom";
 import { DiffUris } from '@theia/editor/lib/browser/diff-uris';
-import { OpenerService, open, StatefulWidget, SELECTED_CLASS } from "@theia/core/lib/browser";
+import { OpenerService, open, StatefulWidget, SELECTED_CLASS, WidgetManager, ApplicationShell } from "@theia/core/lib/browser";
 import { GIT_RESOURCE_SCHEME } from '../git-resource';
 import URI from "@theia/core/lib/common/uri";
 import { GIT_HISTORY, GIT_HISTORY_MAX_COUNT } from './git-history-contribution';
@@ -22,6 +22,9 @@ import { Message } from "@phosphor/messaging";
 import { ElementExt } from "@phosphor/domutils";
 import { FileSystem } from "@theia/filesystem/lib/common";
 import { Key } from "@theia/core/lib/browser/keys";
+import { GitDiffContribution } from "../diff/git-diff-contribution";
+import { GitCommitDetailWidget, GitCommitDetailWidgetOptions } from "./git-commit-detail-widget";
+import { GitCommitDetailWidgetFactory } from "./git-commit-detail-widget-factory";
 
 export interface GitCommitNode {
     readonly authorName: string;
@@ -60,9 +63,12 @@ export class GitHistoryWidget extends GitBaseWidget implements StatefulWidget {
         @inject(GitRepositoryProvider) protected readonly repositoryProvider: GitRepositoryProvider,
         @inject(LabelProvider) protected readonly labelProvider: LabelProvider,
         @inject(OpenerService) protected readonly openerService: OpenerService,
+        @inject(ApplicationShell) protected readonly shell: ApplicationShell,
         @inject(SelectionService) protected readonly selectionService: SelectionService,
         @inject(FileSystem) protected readonly fileSystem: FileSystem,
-        @inject(Git) protected readonly git: Git) {
+        @inject(Git) protected readonly git: Git,
+        @inject(WidgetManager) protected readonly widgetManager: WidgetManager,
+        @inject(GitDiffContribution) protected readonly diffContribution: GitDiffContribution) {
         super(repositoryProvider, labelProvider);
         this.id = GIT_HISTORY;
         this.title.label = "Git History";
@@ -129,6 +135,7 @@ export class GitHistoryWidget extends GitBaseWidget implements StatefulWidget {
                             authorDateRelative: commit.authorDateRelative,
                             commitSha: commit.sha,
                             commitMessage: commit.summary,
+                            messageBody: commit.body,
                             fileChangeNodes,
                             expanded: false,
                             selected: false
@@ -248,7 +255,31 @@ export class GitHistoryWidget extends GitBaseWidget implements StatefulWidget {
                 commit.authorDateRelative + ' by ' + commit.authorName
             )
         );
-        headEl.push(label);
+        const detailBtn = h.div({
+            className: "fa fa-eye detailButton",
+            onclick: () => {
+                const range = {
+                    fromRevision: commit.commitSha + "~1",
+                    toRevision: commit.commitSha
+                };
+                this.widgetManager.getOrCreateWidget(GitCommitDetailWidgetFactory.ID,
+                    <GitCommitDetailWidgetOptions>{
+                        widgetId: "commit" + commit.commitSha,
+                        widgetLabel: "Commit" + commit.commitSha,
+                        commit,
+                        diffOptions: { range }
+                    }).then(async (widget: GitCommitDetailWidget) => {
+                        await widget.setContent({ range });
+                        return widget;
+                    }).then(widget => {
+                        this.shell.addWidget(widget, {
+                            area: 'left'
+                        });
+                        this.shell.activateWidget(widget.id);
+                    });
+            }
+        });
+        headEl.push(label, detailBtn);
         if (!this.singleFileMode) {
             headEl.push(expansionToggle);
         }
