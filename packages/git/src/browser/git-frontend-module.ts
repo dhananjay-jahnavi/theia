@@ -23,6 +23,7 @@ import { GitQuickOpenService } from './git-quick-open-service';
 import { LabelProviderContribution } from '@theia/core/lib/browser/label-provider';
 import { GitUriLabelProviderContribution } from './git-uri-label-contribution';
 import '../../src/browser/style/index.css';
+import { GitBaseWidget } from './git-base-widget';
 
 export default new ContainerModule(bind => {
     bindGitDiffModule(bind);
@@ -40,6 +41,7 @@ export default new ContainerModule(bind => {
     bind(CommandContribution).toDynamicValue(c => c.container.get(GitFrontendContribution));
     bind(KeybindingContribution).toDynamicValue(c => c.container.get(GitFrontendContribution));
     bind(MenuContribution).toDynamicValue(c => c.container.get(GitFrontendContribution));
+    bind(GitBaseWidget).toSelf();
     bind(GitWidget).toSelf();
     bind(WidgetFactory).toDynamicValue(context => ({
         id: GIT_WIDGET_FACTORY_ID,
