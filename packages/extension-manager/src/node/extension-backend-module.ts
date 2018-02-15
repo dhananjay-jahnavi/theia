@@ -13,6 +13,8 @@ import { ExtensionKeywords, NodeExtensionServer } from './node-extension-server'
 import { ApplicationProject, ApplicationProjectOptions } from './application-project';
 import { NpmClient, NpmClientOptions } from './npm-client';
 import { ApplicationProjectArgs, ApplicationProjectCliContribution } from './application-project-cli';
+import { MetricsContribution } from '@theia/metrics/lib/node';
+import { ExtensionManagerMetricsContribution } from './extension-manager-metrics-contribution';
 
 export const extensionKeyword = "theia-extension";
 
@@ -60,4 +62,6 @@ export default new ContainerModule(bind => {
             return server;
         });
     }).inSingletonScope();
+
+    bind(MetricsContribution).to(ExtensionManagerMetricsContribution);
 });
