@@ -66,11 +66,20 @@ export namespace WorkingDirectoryStatus {
  */
 export enum GitFileStatus {
     'New',
+    'Copied',
     'Modified',
-    'Deleted',
     'Renamed',
+    'Deleted',
     'Conflicted',
-    'Copied'
+}
+
+export namespace GitFileStatus {
+
+    /**
+     * Compares the statuses based on the natural order of the enumeration.
+     */
+    export const statusCompare = (left: GitFileStatus, right: GitFileStatus): number => left - right;
+
 }
 
 /**
