@@ -108,6 +108,7 @@ export class GitDecorator implements TreeDecorator {
 
     protected toDecorator(change: GitFileChange): TreeDecoration.Data {
         switch (change.status) {
+            case GitFileStatus.Deleted: // Fall through. Deleted files are not visible in the editor, we mark their container as modified instead.
             case GitFileStatus.Renamed: // Fall through.
             case GitFileStatus.Modified:
                 return {
@@ -124,14 +125,14 @@ export class GitDecorator implements TreeDecorator {
                 const staged = !!change.staged;
                 return {
                     captionPrefix: {
-                        data: staged ? '＋' : 'U',
+                        data: staged ? '＋' : '⋃',
                         fontData: {
                             color: 'var(--theia-success-color0)',
-                            style: staged ? 'bold' : 'normal'
+                            style: 'bold'
                         }
                     }
                 };
-            case GitFileStatus.Conflicted: {
+            case GitFileStatus.Conflicted:
                 return {
                     captionPrefix: {
                         data: '⇆',
@@ -141,9 +142,8 @@ export class GitDecorator implements TreeDecorator {
                         }
                     }
                 };
-            }
             default: {
-                this.logger.warn(`Unhandled Git file change: ${change}.`);
+                this.logger.warn(`Unhandled Git file change: ${change.uri} [Status: ${change.status}].`);
                 return {};
             }
         }
