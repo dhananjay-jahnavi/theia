@@ -57,5 +57,5 @@ export default new ContainerModule(bind => {
 
     bind(LabelProviderContribution).to(GitUriLabelProviderContribution).inSingletonScope();
     bind(GitDecorator).toSelf().inSingletonScope();
-    bind(NavigatorTreeDecorator).toDynamicValue(ctx => ctx.container.get(GitDecorator)).inSingletonScope();
+    bind(NavigatorTreeDecorator).to(GitDecorator).inSingletonScope();
 });

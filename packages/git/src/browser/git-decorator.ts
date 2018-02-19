@@ -77,7 +77,7 @@ export class GitDecorator implements TreeDecorator {
 
     protected appendContainerChanges(tree: ITree, changes: GitFileChange[]): Map<string, GitFileChange> {
         const result: Map<string, GitFileChange> = new Map();
-        // We traverse up and assign the diagnostic to the container directory.
+        // We traverse up and assign the highest Git file change status the container directory.
         // Note, instead of stopping at the WS root, we traverse up the driver root.
         // We will filter them later based on the expansion state of the tree.
         for (const [uri, change] of new Map(changes.map(m => [new URI(m.uri), m] as [URI, GitFileChange])).entries()) {
